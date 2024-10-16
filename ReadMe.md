@@ -7,6 +7,8 @@
 > Cách define CSSA module: [https://github.com/artrela/mulitmodal-cssa/blob/main/model-train.ipynb]()
 >
 > Tham khảo tool train của YOLOX: [https://github.com/Megvii-BaseDetection/YOLOX]()
+>
+> Link datasets: [https://drive.google.com/file/d/1BTlpXGTtcE9nW0p6PWF1-JuxJCkD6fnv/view?usp=sharing](https://drive.google.com/file/d/1BTlpXGTtcE9nW0p6PWF1-JuxJCkD6fnv/view?usp=sharing)
 
 > **Các step cần thực hiện:**
 >
