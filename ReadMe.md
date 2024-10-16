@@ -5,6 +5,8 @@
 > Cách define dataloader: [https://jovian.com/zachwad/boat-pytorch-yolov5#C15]()
 >
 > Cách define CSSA module: [https://github.com/artrela/mulitmodal-cssa/blob/main/model-train.ipynb]()
+>
+> Tham khảo tool train của YOLOX: [https://github.com/Megvii-BaseDetection/YOLOX]()
 
 > **Các step cần thực hiện:**
 >
