@@ -14,4 +14,6 @@
 >
 > **Step 3:** Phát triển tools training và eval cho new model
 
-* [ ] Nhiệm vụ 1: Nghiên cứu, phát triển model 2 đầu vào based on trên YOLO
+* [X] Nhiệm vụ 1: Nghiên cứu, phát triển model 2 đầu vào based on trên YOLO
+* [X] Nhiệm vụ 2: Thiết kế dataloader cho model
+* [ ] Nhiệm vụ 3: Viết tool train cho model
