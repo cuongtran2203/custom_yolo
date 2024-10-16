@@ -1,0 +1,7 @@
+torch 
+torchvision
+opencv-python
+megengine
+mmcv==2.1.0
+mmdet
+pandas
