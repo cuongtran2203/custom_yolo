@@ -79,15 +79,15 @@ def collate_fn(batch):
     for i, lb in enumerate(label):
         lb[:, 0] = i  # add target image index for build_targets()
     return torch.stack(im_rgb, 0), torch.stack(im_ir, 0), torch.cat(label, 0)
-if __name__ == "__main__":
-    img_folder = 'RGB_IR_dataset/train'  
-    label_folder = 'dataset/labels/train'  
-    dataset = YoloDataset(img_folder=img_folder)  
+# if __name__ == "__main__":
+#     img_folder = 'RGB_IR_dataset/train'  
+#     label_folder = 'dataset/labels/train'  
+#     dataset = YoloDataset(img_folder=img_folder)  
     
-    data_loader = DataLoader(dataset, batch_size=2, shuffle=True, num_workers=0,collate_fn=collate_fn)  
+#     data_loader = DataLoader(dataset, batch_size=2, shuffle=True, num_workers=0,collate_fn=collate_fn)  
     
-    # Kiểm tra một batch dữ liệu  
-    for imgrgb,imgir, labels in data_loader:  
-        print(imgrgb.shape)  # Kiểm tra kích thước của batch  
-        print(labels.shape)  
-        break  
+#     # Kiểm tra một batch dữ liệu  
+#     for imgrgb,imgir, labels in data_loader:  
+#         print(imgrgb.shape)  # Kiểm tra kích thước của batch  
+#         print(labels.shape)  
+#         break  
