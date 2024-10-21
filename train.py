@@ -70,7 +70,6 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
             
-            
             # Logging training
             writer.add_scalar("Total Loss/Train",loss,e)
             writer.add_scalar("Iou_loss/Train",iou_loss,e)
@@ -78,8 +77,10 @@ if __name__ == "__main__":
             writer.add_scalar("L1_loss/Train",l1_loss,e)
             writer.add_scalar("num_fg/Train",num_fg,e)
         
-            
-        evaluate(model,data_loader_valid)
+        metric_vals, avg_inf_time= evaluate(model,data_loader_valid)
+        writer.add_scalar("mAP/val",metric_vals["map"],e)
+        writer.add_scalar("mAP_50/val",metric_vals["map_50"],e)
+        writer.add_scalar("mAP_75/val",metric_vals["map_75"],e)
         save_checkpoint(e,False,"output","model_ir_rgb")  
             
             
