@@ -6,3 +6,4 @@ torchmetrics
 mmcv==2.1.0
 mmdet
 pandas
+loguru

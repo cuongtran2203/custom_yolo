@@ -7,6 +7,7 @@ from process_output_input import *
 from process_coupled_head import *
 from torch.utils.data import DataLoader  
 from tqdm import tqdm
+from loguru import Logger
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 from torchmetrics.detection import MeanAveragePrecision
@@ -39,6 +40,7 @@ def evaluate(model, dataloader):
 
 if __name__ == "__main__":
     # Định nghĩa hyper params
+    logger = Logger()
     EPOCHS = 50
     LR = 0.0001
     BATCH_SIZE = 8
@@ -51,36 +53,53 @@ if __name__ == "__main__":
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.0001)
     #Khởi tạo dataloader
     
-    img_folder = 'RGB_IR_dataset/train/images'  
-    label_folder = 'RGB_IR_dataset/train/labels'  
-    img_folder_valid = 'RGB_IR_dataset/val/images'
-    label_folder_valid = 'RGB_IR_dataset/val/labels' 
+    img_folder = 'RGB_IR_dataset/train'  
+    label_folder = 'RGB_IR_dataset/train'  
+    img_folder_valid = 'RGB_IR_dataset/val'
+    label_folder_valid = 'RGB_IR_dataset/val' 
     dataset_train = YoloDataset(img_folder=img_folder)  
     dataset_val = YoloDataset(img_folder=img_folder_valid)  
     data_loader_train = DataLoader(dataset_train, batch_size=BATCH_SIZE, shuffle=True, num_workers=0,collate_fn=collate_fn)
     data_loader_valid = DataLoader(dataset_val, batch_size=BATCH_SIZE, shuffle=True, num_workers=0,collate_fn=collate_fn)
     
     
-    for e in EPOCHS:
+    for e in range(EPOCHS):
+        loss_t = 0
+        iou_loss_t = 0
+        conf_loss_t = 0
+        cls_loss_t = 0
+        
         for data in tqdm(data_loader_train):
             rgb,ir,labels = data
             
-            loss,iou_loss,conf_loss,l1_loss,num_fg = model(rgb,ir,labels,rgb)
+            loss,iou_loss,conf_loss,cls_loss,l1_loss,num_fg = model(rgb,ir,labels,rgb)
             
             loss.backward()
             optimizer.step()
-            
+            loss_t += loss.item()
+            iou_loss_t += iou_loss.item()
+            conf_loss_t += conf_loss.item()
+            cls_loss_t += cls_loss.item()
             # Logging training
             writer.add_scalar("Total Loss/Train",loss,e)
             writer.add_scalar("Iou_loss/Train",iou_loss,e)
             writer.add_scalar("Conf_loss/Train",conf_loss,e)
+            writer.add_scalar("Cls_loss/Train",cls_loss,e)
             writer.add_scalar("L1_loss/Train",l1_loss,e)
             writer.add_scalar("num_fg/Train",num_fg,e)
+        loss_t = loss_t/len(data_loader_train)
+        iou_loss_t = iou_loss_t/len(data_loader_train)
+        conf_loss_t =  conf_loss_t/len(data_loader_train)
+        cls_loss_t = cls_loss_t/len(data_loader_train)
+        
+        
+        logger.info(f"Total loss: {loss_t} IOU_Loss: {iou_loss_t} conf_loss: {conf_loss_t} cls_loss: {cls_loss_t} at EPOCH {e}")
         
         metric_vals, avg_inf_time= evaluate(model,data_loader_valid)
         writer.add_scalar("mAP/val",metric_vals["map"],e)
         writer.add_scalar("mAP_50/val",metric_vals["map_50"],e)
         writer.add_scalar("mAP_75/val",metric_vals["map_75"],e)
+        logger.info(f"EVAL =>>>> mAP: {metric_vals["map"]} mAP 50:{metric_vals["map_50"]} mAP 75: {metric_vals["map_75"]} at epoch {e}")
         save_checkpoint(e,False,"output","model_ir_rgb")  
             
             
