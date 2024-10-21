@@ -61,8 +61,8 @@ if __name__ == "__main__":
     dataset_val = YoloDataset(img_folder=img_folder_valid)  
     data_loader_train = DataLoader(dataset_train, batch_size=BATCH_SIZE, shuffle=True, num_workers=0,collate_fn=collate_fn)
     data_loader_valid = DataLoader(dataset_val, batch_size=BATCH_SIZE, shuffle=True, num_workers=0,collate_fn=collate_fn)
-    
-    
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    model.to(device)
     for e in range(EPOCHS):
         loss_t = 0
         iou_loss_t = 0
@@ -71,7 +71,9 @@ if __name__ == "__main__":
         
         for data in tqdm(data_loader_train):
             rgb,ir,labels = data
-            
+            rgb.to(device)
+            ir.to(device)
+            labels.to(device)
             loss,iou_loss,conf_loss,cls_loss,l1_loss,num_fg = model(rgb,ir,labels,rgb)
             
             loss.backward()
@@ -87,6 +89,7 @@ if __name__ == "__main__":
             writer.add_scalar("Cls_loss/Train",cls_loss,e)
             writer.add_scalar("L1_loss/Train",l1_loss,e)
             writer.add_scalar("num_fg/Train",num_fg,e)
+            
         loss_t = loss_t/len(data_loader_train)
         iou_loss_t = iou_loss_t/len(data_loader_train)
         conf_loss_t =  conf_loss_t/len(data_loader_train)
@@ -96,10 +99,14 @@ if __name__ == "__main__":
         logger.info(f"Total loss: {loss_t} IOU_Loss: {iou_loss_t} conf_loss: {conf_loss_t} cls_loss: {cls_loss_t} at EPOCH {e}")
         
         metric_vals, avg_inf_time= evaluate(model,data_loader_valid)
-        writer.add_scalar("mAP/val",metric_vals["map"],e)
-        writer.add_scalar("mAP_50/val",metric_vals["map_50"],e)
-        writer.add_scalar("mAP_75/val",metric_vals["map_75"],e)
-        logger.info(f"EVAL =>>>> mAP: {metric_vals["map"]} mAP 50:{metric_vals["map_50"]} mAP 75: {metric_vals["map_75"]} at epoch {e}")
+        
+        mAP = metric_vals["map"]
+        mAP_50 =  metric_vals["map_50"]
+        mAP_75 =  metric_vals["map_75"]
+        writer.add_scalar("mAP/val",mAP,e)
+        writer.add_scalar("mAP_50/val",mAP_50,e)
+        writer.add_scalar("mAP_75/val",mAP_75,e)
+        logger.info(f"EVAL =>>>> mAP: {mAP} mAP 50:{mAP_50} mAP 75: {mAP_75} at epoch {e}")
         save_checkpoint(e,False,"output","model_ir_rgb")  
             
             
